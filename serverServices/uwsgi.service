@@ -1,0 +1,22 @@
+[Unit]
+Description=uWSGI Service
+
+After=network.target
+
+
+
+
+[Service]
+User=www-data
+
+Group=www-data
+
+WorkingDirectory=/var/www/flasktesting
+
+ExecStart= /var/www/flasktesting/venv/bin/uwsgi --ini /var/www/flasktesting/uwsgi.ini
+
+
+
+
+[Install]
+WantedBy=multi-user.target
