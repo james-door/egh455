@@ -1,13 +1,35 @@
 import {React,useState, useEffect} from "react";
 import { Line } from "react-chartjs-2";
 import Chart from "chart.js/auto";
-import { CategoryScale } from "chart.js";
+import { CategoryScale, elements } from "chart.js";
 
 Chart.register(CategoryScale);
 
+function getFormattedTimeFromUNIXTime(unixTime) {
 
+  const date = new Date(unixTime * 1000); 
+  const minutes = date.getMinutes().toString().padStart(2, '0'); 
+  const seconds = date.getSeconds().toString().padStart(2, '0'); 
+  const miliseconds = date.getMilliseconds().toString().padStart(3, '0'); 
 
+  const formattedDateTime = `${minutes}:${seconds}.${miliseconds}`;
+  return formattedDateTime;
+}
 
+function getDateFromUNIXTime(unixTime) {
+
+  const date = new Date(unixTime * 1000); 
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  let hours = date.getHours();
+
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12 || 12; 
+
+  const formattedDateTime = `${day}/${month}/${year} at ${hours}${ampm}`;
+  return formattedDateTime;
+}
 
 export default function LineGraph({ chartData, name })
 {
@@ -37,6 +59,8 @@ export default function LineGraph({ chartData, name })
   function graphData()
   {
     var gasData = null
+
+
     if(activeGraph == "Reducing")
       gasData = chartData.reducing
     else if(activeGraph == "Oxidising")
@@ -44,7 +68,7 @@ export default function LineGraph({ chartData, name })
     else
       gasData = chartData.ammonia
     return({
-    labels: chartData.time,
+    labels:  chartData.time.map(element => {return getFormattedTimeFromUNIXTime(element)}),
     datasets: [
       {
         data: gasData,
@@ -73,7 +97,7 @@ export default function LineGraph({ chartData, name })
             x: {
               title: {
                 display: true,
-                text: 'Time (Units)'
+                text: 'Time (Minutes : Seconds. Miliseconds)'
               }
             },
             y: {
@@ -86,7 +110,7 @@ export default function LineGraph({ chartData, name })
         plugins: {
           title: {
             display: true,
-            text: activeGraph
+            text: activeGraph + ` - ${getDateFromUNIXTime(chartData.time.pop())}`
           },
           legend: {
             display: false

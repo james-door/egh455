@@ -1,11 +1,11 @@
 import {React,useState, useEffect} from "react";
 import LineGraph from "../Componets/LineGraph";
 import Gauge from "../Componets/Gauge"
-import NavBar from "../Componets/Navbar"
     
+const currentTime =  Date.now()/1000 
 const defaultValue = {
   graphData :{
-    time : [0,0,0,0,0,0,0,0,0,0],
+    time : [currentTime,currentTime,currentTime,currentTime,currentTime,currentTime,currentTime,currentTime,currentTime,currentTime],
     reducing: [0,0,0,0,0,0,0,0,0,0],
     oxidising: [0,0,0,0,0,0,0,0,0,0], 
     ammonia : [0,0,0,0,0,0,0,0,0,0]
