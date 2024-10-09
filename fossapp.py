@@ -30,7 +30,7 @@ def getRandomImage():
          image_buffer = pickle.loads(image_pkl)
          
       success,encoded_image = cv2.imencode('.jpg', image_buffer)
-
+    
       yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + encoded_image.tobytes() + b'\r\n')
 
@@ -48,7 +48,7 @@ def getRandomFloatData():
    p = r.pubsub()
    p.subscribe('hazardous_gas')
    while True:
-        message = p.get_message()
+        message = p.get_message(timeout=None)
         if message and message['type'] == 'message':
             data = json.loads(message['data'])
 
@@ -64,8 +64,8 @@ def getRandomFloatData():
         data = {'reducing': list(window), 'oxidising' : list(oxidisingWindow),'ammonia' : list(ammoniaWindow),
                 'time' : list(time), 'pressure' : pressure, 'temperature' : temperature,
                 'humidity' : humidity, 'light' : light}
-        print(f"Received data gas: {data}")     # Debugging line to check if data is being received
-        print()
+        # print(f"Received data gas: {data}")     # Debugging line to check if data is being received
+        # print()
         yield f"data: {json.dumps(data)}\n\n"
 
 
