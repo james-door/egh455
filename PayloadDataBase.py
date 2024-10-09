@@ -5,9 +5,10 @@ import cv2
 import os
 tableName = "payloadData"
 
-dataBaseAbsoloutePath = "/var/www/flasktesting/payloadDB.sqlite3"
+dataBaseAbsoloutePath = "/var/www/egh455/payloadDB.sqlite3"
+# dataBaseAbsoloutePath = "/home/455G16/payloadDB.sqlite3"
 
-debugImagePath = "/var/www/flasktesting/frontend/public/identifiedTargets"
+debugImagePath = "/var/www/egh455/frontend/public/identifiedTargets"
 
 
 # create and pass data to redis
