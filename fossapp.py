@@ -23,7 +23,7 @@ def getRandomImage():
     image_buffer = np.random.randint(0,255,size=(712,712,3),dtype = "uint8")
 
     while(True):
-      message = p.get_message()
+      message = p.get_message(timeout=None)
       if message and message['type'] == 'message':
          data = json.loads(message['data'])
          image_pkl = base64.b64decode(data['video'])
