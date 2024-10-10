@@ -7,8 +7,8 @@ from PIL import Image, ImageDraw, ImageFont
 import socket
 import time
 import colorsys
-
-
+import cv2
+import numpy as np
 try:
     # Transitional fix for breaking change in LTR559
     from ltr559 import LTR559
@@ -67,6 +67,7 @@ class GasCollection:
             "oxidised", # 5
             "reduced", # 6
             "nh3", # 7
+            "feeed", #8
              ]
         
         for v in self.variables:
@@ -95,6 +96,8 @@ class GasCollection:
         # Write the text at the top in black
         self.draw.text((0, 0), message, font = self.font, fill=(0, 0, 0))
         self.st7735.display(self.img)
+    def __del__(self):
+        self.st7735.reset()
 
     def get_cpu_temperature(self):
         with open("/sys/class/thermal/thermal_zone0/temp", "r") as f:
@@ -156,7 +159,7 @@ class GasCollection:
             print(self.mode)
             self.last_page = time.time()
 
-    def updateLCD(self, gasData):
+    def updateLCD(self, gasData, frame):
         self.pollProximity()
         if self.mode == 0:
             self.display_ip()
@@ -189,20 +192,17 @@ class GasCollection:
             # variable = "ammonia"
             unit = "ppm"
             self.display_text(self.variables[self.mode], gasData["ammonia"], unit)
-                                         
+        elif self.mode == 8:
+            resizedFrame = cv2.resize(frame, (self.HEIGHT,self.WIDTH), interpolation=cv2.INTER_CUBIC)
+            self.st7735.display(Image.fromarray(resizedFrame).convert('RGB'))
 
 
 
 
-gc = GasCollection()
+# gc = GasCollection()
 
-while(1):
-    data = gc.getData()
-    gc.updateLCD(data)
-
-
-
-# gc.display_ip()
-# print(gc.getData())
+# while(1):
+#     data = gc.getData()
+#     gc.updateLCD(data)
 
 

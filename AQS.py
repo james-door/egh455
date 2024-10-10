@@ -225,17 +225,30 @@ class YOLOApp:
 
         if inRgb is not None:
             frame = inRgb.getCvFrame()
-            frame, angle, label = self.detector.process_detections(frame, inDet.detections)
+            frame, angle, labels = self.detector.process_detections(frame, inDet.detections)
             frame, pos = estimate_pose(frame)
-            print(label)
-            return {"frame" : frame , "pos" : pos, "angle" : angle}
+            
+            detections = []
+            if "needle" in labels or "base" in labels or "gauge" in labels:
+                detections.append("Gauge")
+            if "open" in labels or "closed" in labels:
+                detections.append("Valve")
+
+            return {"frame" : frame , "pos" : pos, "angle" : angle, "detections" : detections}
             # frame = estimate_pose(frame)
             # self.webCon.sendVideoFeed(frame)
             # cv2.imshow("YOLO and ArUco", frame)
 
         # return cv2.waitKey(1) == ord('q')
 
+    def renameDetection(self, detection):
+        if detection == "needle" or detection == "base" or  detection == "gauge":
+            return "Gauge"
+        else:
+            return "Valve"
+
     def cleanup(self):
         """Cleanup and close the application."""
         cv2.destroyAllWindows()
 
+ 
