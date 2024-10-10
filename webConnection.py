@@ -14,5 +14,9 @@ class webConnection:
         video_feed_data = json.dumps(data)
         self.r.publish('video_feed', video_feed_data)
 
+    def sendGasData(self,gasData):
+        print(gasData)
+        self.r.publish('hazardous_gas',json.dumps(gasData))
+
 
 

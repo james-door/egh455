@@ -1,4 +1,4 @@
-import GasCollection
+# import GasCollection
 import st7735
 from fonts.ttf import RobotoMedium as UserFont
 from PIL import Image, ImageDraw, ImageFont
@@ -31,7 +31,7 @@ if __name__ == "__main__":
 
     
 
-    gd = GasCollection.GasCollection()
+    # gd = GasCollection.GasCollection()
     parser = argparse.ArgumentParser()
     parser.add_argument("-m", "--model", help="Provide model path for inference", default='model/best_openvino_2022.1_6shave.blob', type=str)
     args = parser.parse_args()
@@ -43,11 +43,11 @@ if __name__ == "__main__":
     drillThread = Thread(target=drill)
 
     while(True):
-        # print(gd.getData())
         data = yolo_app.process_frame()
 
         # if(not triggeredDrill ): # and data["angle"] and data["angle"] > 180
         #     triggeredDrill = True
         #     drillThread.start()
-
         webCon.sendVideoFeed(data["frame"])
+        # gasData = gd.getData()
+        # webCon.sendGasData(gasData)
