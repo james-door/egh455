@@ -142,10 +142,10 @@ class GasCollection:
         if ConvertedNh3 < 0:
             ConvertedNh3 = 0
 
-        hazardous_gas_data = {'reducing' : Convertedreduced, 'oxidising' : Convertedoxidised ,
-                              'ammonia' : ConvertedNh3, "time" : 0,
-                            'pressure' : Pressuredata, 'temperature' : Temperaturedata,
-                            'humidity' : Humiditydata, 'light' : Lightdata
+        hazardous_gas_data = {'reducing' : round(Convertedreduced,3), 'oxidising' : round(Convertedoxidised,3) ,
+                              'ammonia' : round(ConvertedNh3,3), "time" : 0,
+                            'pressure' : round(Pressuredata,3), 'temperature' : round(Temperaturedata,3),
+                            'humidity' : round(Humiditydata,3), 'light' : round(Lightdata,3)
                               }
         # self.displayLCD(hazardous_gas_data)
         return hazardous_gas_data

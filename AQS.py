@@ -50,7 +50,7 @@ aruco_params = cv2.aruco.DetectorParameters()
 aruco_detector = cv2.aruco.ArucoDetector(aruco_dict, aruco_params)
 camera_matrix = np.array([[640, 0, 320], [0, 640, 240], [0, 0, 1]], dtype=np.float32)
 dist_coeffs = np.zeros((5, 1), dtype=np.float32)
-marker_size = 0.05  # Marker size in meters (5 cm)
+marker_size = 0.2  # Marker size in meters (20 cm)
 axis = np.float32([[marker_size, 0, 0], [0, marker_size, 0], [0, 0, marker_size], [0, 0, 0]]).reshape(-1, 3)
 
 ### Web Video Interface (WVI) connection ###
@@ -84,7 +84,7 @@ def estimate_pose(frame):
 
                 # Print ArUco marker position and timestamp to console
                 timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                print(f"[{timestamp}] Detected ArUco marker ID {ids[i][0]} at position (X: {x_pos:.2f}, Y: {y_pos:.2f}, Z: {z_pos:.2f})")
+                # print(f"[{timestamp}] Detected ArUco marker ID {ids[i][0]} at position (X: {x_pos:.2f}, Y: {y_pos:.2f}, Z: {z_pos:.2f})")
                 imgpts, _ = cv2.projectPoints(axis, rvec, tvec, camera_matrix, dist_coeffs)
                 imgpts = np.int32(imgpts).reshape(-1, 2)
                 frame = cv2.line(frame, tuple(imgpts[3]), tuple(imgpts[0]), (255, 0, 0), 2)
@@ -185,7 +185,7 @@ class ObjectDetector:
             timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
             # Print detected object information to console
-            print(f"[{timestamp}] Detected {label} at position {center}")
+            # print(f"[{timestamp}] Detected {label} at position {center}")
 
             self.draw_label(frame, bbox, label, detection.confidence)
 
@@ -229,7 +229,7 @@ class YOLOApp:
             frame, pos = estimate_pose(frame)
             
             detections = []
-            if "needle" in labels or "base" in labels or "gauge" in labels:
+            if "needle" in labels and "base" in labels and "gauge" in labels:
                 detections.append("Gauge")
             if "open" in labels or "closed" in labels:
                 detections.append("Valve")

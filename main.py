@@ -11,16 +11,16 @@ import PayloadDataBase
 from threading import Thread
 from gpiozero import Servo
 import time
-
-
+import cv2
+from datetime import datetime, timedelta
 
 def drill():
     servo_pin = 13
     servo = Servo(servo_pin)
     servo.value = 1.0
-    time.sleep(60)  # Spin for 2 seconds
+    time.sleep(44.5)  # Spin for 2 seconds
     servo.value = -1.0  # Set servo to anticlockwise direction with specific speed
-    time.sleep(60)  # Spin for 2 seconds
+    time.sleep(44.5)  # Spin for 2 seconds
     servo.value = 0  # Stop the servo
     servo.detach()  # Stop the servo
 
@@ -48,19 +48,23 @@ if __name__ == "__main__":
         data = yolo_app.process_frame()
 
         detections = data["detections"] if data["detections"] else None
-        if detections:
-            print(detections)
+        
+        if data["angle"]:
+            print("Angle: ",data["angle"])
+            
+        if not triggeredDrill and data["angle"] and data["angle"] > 175:
+            print("START DRILL.")
+            triggeredDrill = True
+            # drillThread.start()
 
-        # if(not triggeredDrill ): # and data["angle"] and data["angle"] > 180
-        #     triggeredDrill = True
-        #     drillThread.start()
         gasData = gd.getData()
         gd.updateLCD(gasData, data["frame"])
         webCon.sendVideoFeed(data["frame"])
-        webCon.sendGasData(gasData)
+        webCon.sendGasData(gasData, currentTime)
 
-        if currentTime - lastTime > 100 or detections: # Every 5 seconds
-            db.dataInsert(currentTime,gasData["pressure"],gasData["temperature"],
-            gasData["humidity"],gasData["light"],gasData["oxidising"],
-            gasData["reducing"],gasData["ammonia"],detections,data["frame"])
-            lastTime = currentTime
+        if currentTime - lastTime > 5 or detections: # Every 5 seconds
+            webCon.sendIdentifiedTarget({"test" : 12})
+            # db.dataInsert(currentTime,gasData["pressure"],gasData["temperature"],
+            # gasData["humidity"],gasData["light"],gasData["oxidising"],
+            # gasData["reducing"],gasData["ammonia"],detections,data["frame"])
+            # lastTime = currentTime
