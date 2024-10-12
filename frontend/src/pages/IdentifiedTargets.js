@@ -1,15 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
-const absoulutePath = "identifiedTargets/"; // For debugging, when running nginx use images/1.jpg
+const absoulutePath = "images/"; // For debugging, when running nginx use images/1.jpg
 
-function identifiedTargetImages() {
-  return (
-    <div className="detected-image">
-      <img src={absoulutePath + "1.jpg"}></img>
-      <h2>Valve Closed</h2>
-    </div>
-  );
-}
+
 
 export default function IdentifiedTargets() {
   const [imageNumber, setImageNumber] = useState(0);

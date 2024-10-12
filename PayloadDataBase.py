@@ -3,17 +3,26 @@ import time
 import datetime
 import cv2
 import os
+
+import stat
+import pwd
+import grp
 tableName = "payloadData"
 
-dataBaseAbsoloutePath = "/var/www/egh455/payloadDB.sqlite3"
-# dataBaseAbsoloutePath = "/home/455G16/payloadDB.sqlite3"
-
-debugImagePath = "/var/www/egh455/frontend/public/identifiedTargets"
+# dataBaseAbsoloutePath = "/var/www/egh455/payloadDB.sqlite3"
+dataBaseAbsoloutePath = "/var/www/egh455/database/payloadDB.sqlite3"
+detectedImagePath = "/var/www/egh455/database/detectedImages"
 
 
 # create and pass data to redis
 class PayloadDataBase:
     def __init__(self):
+
+        
+        # db_directory = os.path.dirname(dataBaseAbsoloutePath)
+        # os.makedirs(db_directory, exist_ok=True)
+        # self.set_permissions(db_directory)
+
         self.conn=sqlite3.connect(dataBaseAbsoloutePath)
         QueryTables = """SELECT name FROM sqlite_master  
         WHERE type='table';"""
@@ -32,16 +41,24 @@ class PayloadDataBase:
                     );
                     '''
         self.cur = self.conn.cursor()
+        
+
+
         self.cur.execute(QueryTables)
-        tables = [table[0] for table in self.cur.fetchall()]
-        if tableName not in tables:
-            self.cur.execute(createTable)
+        # tables = [table[0] for table in self.cur.fetchall()]
+        # if tableName not in tables:
+        #     self.cur.execute(createTable)
           
-            print("Create new table.")
+        #     print("Create new table.")
+
     def __del__(self):
         self.conn.close()
 
-
+    def set_permissions(self, path):
+        uid = pwd.getpwnam('455G16').pw_uid
+        gid = grp.getgrnam('www-data').gr_gid
+        os.chown(path, uid, gid)
+        os.chmod(path, stat.S_IRWXU | stat.S_IRWXG)
     def earliestTime(self):
         writeQuery = f"""
                          SELECT MIN(unix_time) from {tableName}
@@ -61,8 +78,8 @@ class PayloadDataBase:
 
             detectionID = f"{nDetections +1}.jpg"
 
-            os.makedirs(debugImagePath, exist_ok=True)
-            cv2.imwrite(f"{debugImagePath}/{detectionID}",image)
+            os.makedirs(detectedImagePath, exist_ok=True)
+            cv2.imwrite(f"{detectedImagePath}/{detectionID}",image)
  
 
         print(detections)
@@ -103,8 +120,6 @@ class PayloadDataBase:
         result = [dict(zip(column_names, row)) for row in rows]
         return result
 
-
-
     def debugDisplay(self, data):
         for row in data:
             print(f"{datetime.datetime.fromtimestamp(row['unix_time'])}, \
@@ -114,15 +129,8 @@ class PayloadDataBase:
 
 
 
-db = PayloadDataBase()
-print(db.getLatestIdentifiedImage(time.time()))
-
+# db = PayloadDataBase()
+# print(db.getLatestIdentifiedImage(time.time()))
 
 
 # db.dataInsert(0,0,0,0,0,0,0,0,None,None)
-
-
-
-
-
-

@@ -1,36 +1,31 @@
-import React, { useEffect } from "react";
+import React, { useEffect } from 'react';
 
-export default function DetectionNotification() {
-    useEffect(() => {
+function App() {
+  useEffect(() => {
+    const eventSource = new EventSource('/data/target_identified');
+    eventSource.onmessage = function(event) {
+      console.log('New event:', event.data);
+      // Play the notification sound or trigger any other action here
+    //   new Notification('Server Event', {
+    //     body: event.data,
+    //   });
+    };
 
-        fetch(`/data/latest_identified_target?time=${Date.now() / 1000}`)
-        .then((response) => response.json())
-        .then((data) => {
-            console.log(data)
-        })
-        
+    eventSource.onerror = function(err) {
+      console.error('EventSource failed:', err);
+      eventSource.close();
+    };
 
-        const message = new SpeechSynthesisUtterance();
-        message.text = "Hello World!";
-        const speechSynthesis = window.speechSynthesis;
+    return () => {
+      eventSource.close(); // Cleanup on component unmount
+    };
+  }, []);
 
-        const speakMessage = () => {
-            speechSynthesis.speak(message);
-        };
-
-        const interval = setInterval(() => {
-            speakMessage();
-        }, 1000);
-
-        return () => {
-            clearInterval(interval); 
-            speechSynthesis.cancel(); 
-        };
-    }, []); 
-
-    return (
-        <div>
-            <p>Speech notification should play: "Hello World!" every 2 seconds</p>
-        </div>
-    );
+  return (
+    <div>
+      <h1>Server-Sent Events Notification</h1>
+    </div>
+  );
 }
+
+export default App;

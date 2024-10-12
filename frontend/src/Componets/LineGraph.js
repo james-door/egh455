@@ -10,9 +10,8 @@ function getFormattedTimeFromUNIXTime(unixTime) {
   const date = new Date(unixTime * 1000); 
   const minutes = date.getMinutes().toString().padStart(2, '0'); 
   const seconds = date.getSeconds().toString().padStart(2, '0'); 
-  const miliseconds = date.getMilliseconds().toString().padStart(3, '0'); 
 
-  const formattedDateTime = `${minutes}:${seconds}.${miliseconds}`;
+  const formattedDateTime = `${minutes}:${seconds}`;
   return formattedDateTime;
 }
 
@@ -97,13 +96,13 @@ export default function LineGraph({ chartData, name })
             x: {
               title: {
                 display: true,
-                text: 'Time (Minutes : Seconds. Miliseconds)'
+                text: 'Time (Minutes : Seconds)'
               }
             },
             y: {
               title: {
                 display: true,
-                text: 'Gas Data (Units)'
+                text: 'PPM'
               }
             }
           },

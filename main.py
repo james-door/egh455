@@ -71,7 +71,7 @@ def main():
 
         count += 1
 
-        hazardous_gas_data = {'co2' : random.random()*50, 'oxidising' : random.random()*50 +50 ,
+        hazardous_gas_data = {'reducingidentifiedTargetImages' : random.random()*50, 'oxidising' : random.random()*50 +50 ,
                               'ammonia' : random.random()*50 + 100, 'time' :time.time(), 
                             'pressure' : int(random.random()*2000), 'temperature' : int(random.random()*100),
                             'humidity' : int(random.random() * 100), 'light' : int(random.random() * 100)

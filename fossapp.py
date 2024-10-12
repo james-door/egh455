@@ -9,8 +9,10 @@ import pickle
 import random
 from collections import deque
 import PayloadDataBase
+import time
 
-pool = redis.ConnectionPool(host='localhost', port=6379, db=0, max_connections=100)
+
+pool = redis.ConnectionPool(host='localhost', port=6379, db=0, max_connections=4)
 
 app = Flask(__name__)
     
@@ -35,7 +37,7 @@ def getRandomImage():
                b'Content-Type: image/jpeg\r\n\r\n' + encoded_image.tobytes() + b'\r\n')
 
 def getRandomFloatData():
-   window = deque(maxlen=10)
+   reducingWindow = deque(maxlen=10)
    oxidisingWindow = deque(maxlen=10)
    ammoniaWindow = deque(maxlen=10)
 
@@ -52,7 +54,7 @@ def getRandomFloatData():
         if message and message['type'] == 'message':
             data = json.loads(message['data'])
 
-            window.append(data['co2'])
+            reducingWindow.append(data['reducing'])
             oxidisingWindow.append(data['oxidising'])
             ammoniaWindow.append(data['ammonia'])
             
@@ -61,12 +63,20 @@ def getRandomFloatData():
             temperature = data['temperature']
             humidity = data['humidity']
             light = data['light']
-        data = {'reducing': list(window), 'oxidising' : list(oxidisingWindow),'ammonia' : list(ammoniaWindow),
-                'time' : list(time), 'pressure' : pressure, 'temperature' : temperature,
-                'humidity' : humidity, 'light' : light}
-        # print(f"Received data gas: {data}")     # Debugging line to check if data is being received
-        # print()
-        yield f"data: {json.dumps(data)}\n\n"
+            data = {'reducing': list(reducingWindow), 'oxidising' : list(oxidisingWindow),'ammonia' : list(ammoniaWindow),
+                    'time' : list(time), 'pressure' : pressure, 'temperature' : temperature,
+                    'humidity' : humidity, 'light' : light}
+            yield f"data: {json.dumps(data)}\n\n"
+
+
+def event_stream():
+    r = redis.Redis(connection_pool=pool)
+    p = r.pubsub()
+    p.subscribe('target_identified')
+    while True:
+        message = p.get_message(timeout=None)
+        if message and message['type'] == 'message':
+            yield f'data: Notification from server at {time.time()}\n\n'
 
 
 def getDetectedTarget():
@@ -79,23 +89,28 @@ def getDetectedTarget():
         if message and message['type'] == 'message':
             data = json.loads(message['data'])  # Parse the JSON data
     
+            # sys.stdout.flush()
             yield f"data: {json.dumps(data)}\n\n"  # Properly serialize the data to JSON
-
 
 
 
     
 @app.route('/data/hazardous_gas_data')
 def hazardousGasDataFeed():
-    return Response(getRandomFloatData(), mimetype='text/event-stream')
-
-
+    response = Response(getRandomFloatData(), mimetype='text/event-stream')
+    response.headers['Cache-Control'] = 'no-cache'
+    response.headers['X-Accel-Buffering'] = 'no'  
+    return response
    
 @app.route('/data')
 def videoFeed():
-  return Response(getRandomImage(),
+  
+    response = Response(getRandomImage(),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
+    response.headers['Cache-Control'] = 'no-cache'
+    response.headers['X-Accel-Buffering'] = 'no'  
 
+    return response
 
 @app.route('/data/log')
 def dataLog():
@@ -105,13 +120,23 @@ def dataLog():
     data = {'tableData':db.dataRead(startTime, endTime), 'earliestTime':db.earliestTime()}
     return json.dumps(data)
 
-@app.route('/data/latest_identified_target')
-def latestIdentifiedTarget():
-    time = request.args.get('time')
-    db = PayloadDataBase.PayloadDataBase()
+# @app.route('/data/latest_identified_target')
+# def latestIdentifiedTarget():
+#     time = request.args.get('time')
+#     db = PayloadDataBase.PayloadDataBase()
 
-    data = db.getLatestIdentifiedImage(time)
-    return json.dumps(data)
+#     data = db.getLatestIdentifiedImage(time)
+#     return json.dumps(data)
+
+
+@app.route('/data/target_identified')
+def targetIdentified():
+    
+    response = Response(event_stream(), content_type='text/event-stream')
+    response.headers['Cache-Control'] = 'no-cache'
+    response.headers['X-Accel-Buffering'] = 'no'  
+    return response
+
 
 
 

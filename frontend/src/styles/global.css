@@ -145,7 +145,10 @@ body
 .datatable-style {
     width: 100%;
     overflow-x: auto; 
-    
+}
+.datatable-style h2
+{
+    text-align: center;
 }
 
 .table-container {

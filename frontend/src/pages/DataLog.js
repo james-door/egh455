@@ -28,7 +28,7 @@ export default function DataLog()
 
 
     return(
-    <div className="datalog-style">
+    <div className="datatable-style">
         <DataSlider minTime={earliestTime} maxTime={Math.floor(Date.now() / 1000)} onChange={handleSliderChange}/>        
          { logData ? <DataTable data={logData}/> : <h2>Loading...</h2> }
     </div>
