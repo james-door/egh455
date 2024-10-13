@@ -15,22 +15,22 @@ export default function Gauge({gaugeData}) {
   return (
 
     <div className="gauge-container">
-      <div className="sub-gauge">
+      <div >
         <h1>LIGHT</h1>
         <TempGauge temperature={gaugeData.light} barColour={"#f9f871"}/>
         <h2>{gaugeData.light} LUX</h2>
       </div>
-      <div className="sub-gauge">
+      <div >
         <h1>HUMIDITY</h1>
         <TempGauge temperature={gaugeData.humidity} barColour={"#a0f28a"}/>
         <h2>{gaugeData.humidity}%</h2>
       </div>
-      <div className="sub-gauge">
+      <div >
         <h1>TEMP.</h1>
         <TempGauge temperature={gaugeData.temperature} barColour={"#3498db"}/>
         <h2>{gaugeData.temperature}ºC</h2>
       </div>
-       <div className="sub-gauge">
+       <div >
           <h1>PRESSURE</h1>
           <PressureGauge rotation={rotation}/>
           <h2>{pressure}KPa</h2>

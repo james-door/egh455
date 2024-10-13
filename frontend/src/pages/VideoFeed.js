@@ -1,20 +1,30 @@
-import React from 'react';
-
+import React, { useEffect, useRef } from 'react';
 
 function VideoFeed() {
+  const imgRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (imgRef.current) {
+        console.log("DISMOUNT")
+        imgRef.current.src = '';
+      }
+    };
+  }, []); 
 
   return (
     <div className="videofeed-style">
-    <img
-      src={"/data"}
-      alt="Detected Image"
-      onError={(e) => {
-        e.target.onerror = null;
-        e.target.style.display = 'none'; 
-        e.target.insertAdjacentHTML('afterend', '<h1>No Video Feed Available</h1>'); 
-      }}
-    />   
- </div>
+      <img
+        ref={imgRef}
+        src="/data"
+        alt="Detected Image"
+        onError={(e) => {
+          e.target.onerror = null;
+          e.target.style.display = 'none'; 
+          e.target.insertAdjacentHTML('afterend', '<h1>No Video Feed Available</h1>'); 
+        }}
+      />
+    </div>
   );
 }
 

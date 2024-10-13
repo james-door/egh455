@@ -104,7 +104,7 @@ class PayloadDataBase:
         return result
     
     def getIdentifiedImages(self):
-        query = f"SELECT detection_id, detections FROM {tableName} WHERE detection_id IS NOT NULL"
+        query = f"SELECT unix_time, detection_id, detections FROM {tableName} WHERE detection_id IS NOT NULL"
         self.cur.execute(query)
         rows = self.cur.fetchall() 
         column_names = [description[0] for description in self.cur.description]

@@ -12,12 +12,12 @@ import DataLog from './pages/DataLog.js';
 
 import NoPage from './pages/404.js';
 import NavBar from './Componets/Navbar.js';
-import DetectionNotification from './Componets/DetectionNotification.js';
+import NotificationManager from './Componets/NotificationManager.js';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
   <div>
-    <DetectionNotification/>
+    <NotificationManager/>
     <BrowserRouter>
       <NavBar/>
       <Routes>
