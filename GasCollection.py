@@ -156,7 +156,6 @@ class GasCollection:
         if proximity > 1500 and time.time() - self.last_page > self.delay:
             self.mode += 1
             self.mode %= len(self.variables)
-            print(self.mode)
             self.last_page = time.time()
 
     def updateLCD(self, gasData, frame):

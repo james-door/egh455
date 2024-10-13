@@ -17,9 +17,12 @@ class webConnection:
     def sendGasData(self,gasData, time):
         gasData["time"] = time
         self.r.publish('hazardous_gas',json.dumps(gasData))
-    def sendIdentifiedTarget(self, target):
-        self.r.publish('target_identified', json.dumps(target)
-)
+    def sendIdentifiedTarget(self, detections):
+        data = {"detection" : "None"}
+        if detections:
+            data = {"detection" : detections[0]}
+
+        self.r.publish('target_identified', json.dumps(data))
 
 
 

@@ -4,7 +4,7 @@ from fonts.ttf import RobotoMedium as UserFont
 from PIL import Image, ImageDraw, ImageFont
 import os
 import argparse
-import AQS
+import TAIQ
 import webConnection
 import PayloadDataBase
 
@@ -27,31 +27,29 @@ def drill():
 
 if __name__ == "__main__":
 
-
-    
-
     gd = GasCollection.GasCollection()
     parser = argparse.ArgumentParser()
     parser.add_argument("-m", "--model", help="Provide model path for inference", default='model/best_openvino_2022.1_6shave.blob', type=str)
     args = parser.parse_args()
-    yolo_app = AQS.YOLOApp(model_path=args.model)
+    yolo_app = TAIQ.YOLOApp(model_path=args.model)
     yolo_app.initialize()
     webCon = webConnection.webConnection()
-
     triggeredDrill = False
     drillThread = Thread(target=drill)
     db = PayloadDataBase.PayloadDataBase()
     
+    timeSinceLastNotfication = {"Open Valve" : 0, "Closed Valve" : 0, "Pressure Gauge" : 0}
+
     lastTime = time.time()
     while(True):
         currentTime = time.time()
         data = yolo_app.process_frame()
+        webCon.sendVideoFeed(data["frame"])
+
 
         detections = data["detections"] if data["detections"] else None
+
         
-        if data["angle"]:
-            print("Angle: ",data["angle"])
-            
         if not triggeredDrill and data["angle"] and data["angle"] > 175:
             print("START DRILL.")
             triggeredDrill = True
@@ -59,12 +57,19 @@ if __name__ == "__main__":
 
         gasData = gd.getData()
         gd.updateLCD(gasData, data["frame"])
-        webCon.sendVideoFeed(data["frame"])
         webCon.sendGasData(gasData, currentTime)
 
+
+
         if currentTime - lastTime > 5 or detections: # Every 5 seconds
-            webCon.sendIdentifiedTarget({"test" : 12})
-            # db.dataInsert(currentTime,gasData["pressure"],gasData["temperature"],
-            # gasData["humidity"],gasData["light"],gasData["oxidising"],
-            # gasData["reducing"],gasData["ammonia"],detections,data["frame"])
-            # lastTime = currentTime
+            if not detections:
+                webCon.sendIdentifiedTarget(None) # Send pulse every 5 seconds to maintian SSE
+            elif currentTime - timeSinceLastNotfication[detections[0]] > 5:
+                webCon.sendIdentifiedTarget(detections)
+                timeSinceLastNotfication[detections[0]] = time.time() 
+
+
+            db.dataInsert(currentTime,gasData["pressure"],gasData["temperature"],
+            gasData["humidity"],gasData["light"],gasData["oxidising"],
+            gasData["reducing"],gasData["ammonia"],detections,data["frame"])
+            lastTime = currentTime

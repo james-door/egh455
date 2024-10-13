@@ -130,8 +130,3 @@ class PayloadDataBase:
 
 
 
-# db = PayloadDataBase()
-# print(db.getLatestIdentifiedImage(time.time()))
-
-
-# db.dataInsert(0,0,0,0,0,0,0,0,None,None)

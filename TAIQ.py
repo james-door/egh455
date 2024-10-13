@@ -230,9 +230,11 @@ class YOLOApp:
             
             detections = []
             if "needle" in labels and "base" in labels and "gauge" in labels:
-                detections.append("Gauge")
-            if "open" in labels or "closed" in labels:
-                detections.append("Valve")
+                detections.append("Pressure Gauge")
+            if "open" in labels: 
+                detections.append("Open Valve")
+            if "closed" in labels:
+                detections.append("Closed Valve")
 
             return {"frame" : frame , "pos" : pos, "angle" : angle, "detections" : detections}
             # frame = estimate_pose(frame)
@@ -241,11 +243,6 @@ class YOLOApp:
 
         # return cv2.waitKey(1) == ord('q')
 
-    def renameDetection(self, detection):
-        if detection == "needle" or detection == "base" or  detection == "gauge":
-            return "Gauge"
-        else:
-            return "Valve"
 
     def cleanup(self):
         """Cleanup and close the application."""
